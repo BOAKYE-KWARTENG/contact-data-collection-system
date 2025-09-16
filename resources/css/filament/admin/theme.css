@@ -1,0 +1,56 @@
+@import '../../../../vendor/filament/filament/resources/css/theme.css';
+
+@config 'tailwind.config.js';
+
+
+
+body.fi-body {
+    background: linear-gradient(135deg, #b3cbf8 0%, #d1b1fc 100%);
+}
+
+nav.fi-tabs {
+    width: 100% !important;
+}
+
+/* Style the navigation tabs container */
+nav.fi-tabs {
+    display: flex;
+    max-width: 100%;
+    gap: 0.25rem; /* Space between tabs */
+    overflow-x: auto; /* Allow horizontal scrolling if needed */
+    margin-left: auto;
+    margin-right: auto;
+    border-radius: 0.75rem; /* Rounded corners */
+    background-color: #fff; /* Light background */
+    padding: 0.5rem;
+    box-shadow: 0 1px 2px 0 rgba(16, 24, 40, 0.05); /* Subtle shadow */
+    border: 1px solid rgba(16, 24, 40, 0.05); /* Light border */
+    justify-content: space-between; /* Space tabs evenly */
+}
+
+/* Dark mode styles for navigation tabs */
+@media (prefers-color-scheme: dark) {
+    nav.fi-tabs {
+        background-color: #ffffff; /* Dark background */
+        border-color: rgba(255,255,255,0.1); /* Lighter border in dark mode */
+    }
+}
+
+/* Style the tab items container */
+nav.fi-tabs .fi-tabs-items {
+    display: flex;
+    width: 100%;
+    gap: 0.25rem; /* Space between tab items */
+    justify-content: space-between; /* Space tab items evenly */
+}
+
+/* Make each tab item flexible and centered */
+nav.fi-tabs .fi-tabs-items > * {
+    flex: 1 1 0; /* Allow tabs to grow/shrink equally */
+    text-align: center; /* Center tab text */
+}
+
+
+.fi-wi-table {
+    width: 100%;
+}
