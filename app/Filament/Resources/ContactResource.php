@@ -221,4 +221,49 @@ class ContactResource extends Resource
             'sort' => Pages\SortContacts::route('/sort'),
         ];
     }
+
+
+
+
+
+    // added
+    protected static function isAdmin(): bool
+    {
+        return (bool) auth()->user()?->hasRole('admin');
+    }
+
+    protected static function isUser(): bool
+    {
+        return (bool) auth()->user()?->hasRole('user');
+    }
+    
+
+
+
+    public static function canViewAny(): bool
+    {
+        return (bool) auth()->user()?->hasAnyRole(['admin', 'user']);
+    }
+
+
+
+    public static function canCreate(): bool
+    {
+        return (bool) auth()->user()?->hasAnyRole(['admin', 'user']);
+    }
+
+
+    public static function canEdit($record): bool
+    {
+        return (bool) auth()->user()?->hasRole('admin');
+    }
+
+
+    public static function canDelete($record): bool
+    {
+        return (bool) auth()->user()?->hasRole('admin');
+    }
+
+    
+
 }
