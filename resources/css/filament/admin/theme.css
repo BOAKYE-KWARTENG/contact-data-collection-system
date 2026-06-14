@@ -8,6 +8,17 @@ body.fi-body {
     background: linear-gradient(135deg, #b3cbf8 0%, #d1b1fc 100%);
 }
 
+
+/* 
+body.fi-body {
+    background-image: url('/images/Background.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+*/
+
+
 nav.fi-tabs {
     width: 100% !important;
 }

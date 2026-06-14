@@ -18,6 +18,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use pxlrbt\FilamentSpotlight\SpotlightPlugin;  // Import the SpotlightPlugin
+// use App\Filament\Pages\Auth\Login; // Import the custom Login page
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -25,11 +26,15 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
+            // Panel Customization
             ->brandName('Contact Manager')
             ->id('bkwindfred')
             ->path('bkwindfred')
             ->favicon('images/home-button.png')
-            ->login()
+            ->login(\App\Filament\Pages\Auth\Login::class) //added custom login page
+            //->registration(\App\Filament\Pages\Auth\Register::class) // added custom registration page
+            //->passwordReset() // added custom password reset page
+            //->emailVerification() // added custom email verification page
             ->colors([
                 'primary' => Color::Blue,
             ])
