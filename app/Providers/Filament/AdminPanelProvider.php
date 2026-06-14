@@ -25,6 +25,7 @@ class AdminPanelProvider extends PanelProvider
     {
         return $panel
             ->default()
+            ->brandName('Contact Manager')
             ->id('bkwindfred')
             ->path('bkwindfred')
             ->favicon('images/home-button.png')
