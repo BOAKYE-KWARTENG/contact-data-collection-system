@@ -24,6 +24,9 @@ class RecentContacts extends BaseWidget
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('gender'),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()           // 👈 renders as a colored badge
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime(),
             ]);
     }

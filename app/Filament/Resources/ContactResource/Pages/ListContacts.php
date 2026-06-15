@@ -86,27 +86,29 @@ class ListContacts extends ListRecords
         ];
     }
 
-    
-
-
 
     public function getTabs(): array
     {
         return [
-            'All' => Tab::make(),
-            'MTN' => Tab::make()->query(fn (Builder $query) => $query->where('telco', 'MTN')),
-            'Telecel' => Tab::make()->query(fn (Builder $query) => $query->where('telco', 'Telecel')),
+            'All'        => Tab::make(),
+
+            // Telco — keep as-is (DB values are uppercase, matches perfectly)
+            'MTN'        => Tab::make()->query(fn (Builder $query) => $query->where('telco', 'MTN')),
+            'Telecel'    => Tab::make()->query(fn (Builder $query) => $query->where('telco', 'Telecel')),
             'AirtelTigo' => Tab::make()->query(fn (Builder $query) => $query->where('telco', 'AirtelTigo')),
-            'Glo' => Tab::make()->query(fn (Builder $query) => $query->where('telco', 'Glo')),
-            'Male' => Tab::make()->query(fn (Builder $query) => $query->where('gender', 'Male')),
-            'Female' => Tab::make()->query(fn (Builder $query) => $query->where('gender', 'Female')),
-            'Single' => Tab::make()->query(fn (Builder $query) => $query->where('marital_status', 'Single')),
-            'Married' => Tab::make()->query(fn (Builder $query) => $query->where('marital_status', 'Married')),
-            'Divorced' => Tab::make()->query(fn (Builder $query) => $query->where('marital_status', 'Divorced')),
-            'Widowed' => Tab::make()->query(fn (Builder $query) => $query->where('marital_status', 'Widowed')),
+            'Glo'        => Tab::make()->query(fn (Builder $query) => $query->where('telco', 'Glo')),
+
+            // Gender — changed 'Male' → 'male', 'Female' → 'female'
+            'Male'       => Tab::make()->query(fn (Builder $query) => $query->where('gender', 'male')),
+            'Female'     => Tab::make()->query(fn (Builder $query) => $query->where('gender', 'female')),
+
+            // Marital Status — changed all to lowercase
+            'Single'     => Tab::make()->query(fn (Builder $query) => $query->where('marital_status', 'single')),
+            'Married'    => Tab::make()->query(fn (Builder $query) => $query->where('marital_status', 'married')),
+            'Divorced'   => Tab::make()->query(fn (Builder $query) => $query->where('marital_status', 'divorced')),
+            'Widowed'    => Tab::make()->query(fn (Builder $query) => $query->where('marital_status', 'widowed')),
         ];
     }
-
 
     public function getDefaultActiveTab(): string | int | null
     {

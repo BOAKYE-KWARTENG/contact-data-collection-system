@@ -18,7 +18,7 @@ use Filament\Tables\Filters\TernaryFilter;
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use EightyNine\ExcelImport\ExcelImportAction;
 use Filament\Actions\CreateAction;
-
+use App\Enums\ContactStatus;
 
 
 
@@ -83,6 +83,13 @@ class ContactResource extends Resource
                                 'Glo' => 'Glo',
                             ]),
 
+                        Forms\Components\Select::make('status')
+                            ->label('Status')
+                            ->options(fn () => collect(ContactStatus::cases())->pluck('name', 'value')->toArray())
+                            ->default(ContactStatus::Lead)
+                            ->required()
+                            ->native(false),
+
                         Forms\Components\TextInput::make('email')
                             ->email()
                             ->required()
@@ -101,13 +108,19 @@ class ContactResource extends Resource
                 Tables\Columns\TextColumn::make('name')
                     ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('gender'),
-                Tables\Columns\TextColumn::make('age_range'),
+                //Tables\Columns\TextColumn::make('age_range'),
                 Tables\Columns\TextColumn::make('marital_status'),
                 Tables\Columns\TextColumn::make('mobile_number')
                     ->searchable(isIndividual: true),
                 Tables\Columns\TextColumn::make('telco'),
-                Tables\Columns\TextColumn::make('email')
+                Tables\Columns\BadgeColumn::make('status')
+                    ->label('Status')
+                    ->badge()           // 👈 renders as a colored badge
+                    ->sortable()
                     ->searchable(),
+                    
+                //Tables\Columns\TextColumn::make('email')
+                    //->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -129,6 +142,13 @@ class ContactResource extends Resource
                         'female' => 'Female',
                         'other' => 'Other',
                     ]),
+                Tables\Filters\SelectFilter::make('status')
+                    ->label('Status')
+                    ->options(
+                        collect(ContactStatus::cases())->mapWithKeys(fn($case) => [$case->value => $case->getLabel()])->toArray()
+                    )
+                    ->multiple()        // allow filtering by multiple statuses
+                    ->preload(),
                 Tables\Filters\SelectFilter::make('marital_status')
                     ->options([
                         'single' => 'Single',
@@ -203,7 +223,11 @@ class ContactResource extends Resource
             //
         ];
     }
+    
 
+    // ADDED: Added tabs to the table view----------------------------
+    
+    // ----------------------------------------------------------------
 
 
     public static function getEloquentQuery(): Builder

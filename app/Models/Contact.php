@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Enums\ContactStatus;
 
 class Contact extends Model
 {
@@ -16,6 +17,11 @@ class Contact extends Model
         'marital_status',
         'mobile_number',
         'telco',
+        'status',
         'email',
+    ];
+
+    protected $casts = [
+        'status' => ContactStatus::class, // 👈 cast to enum
     ];
 }
