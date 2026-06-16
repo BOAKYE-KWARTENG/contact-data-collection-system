@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Filters\TernaryFilter;
 
+use App\Filament\Resources\ContactResource\RelationManagers\NotesRelationManager; // 
+
 
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
 use EightyNine\ExcelImport\ExcelImportAction;
@@ -243,7 +245,8 @@ class ContactResource extends Resource
     public static function getRelations(): array
     {
         return [
-            ActivitiesRelationManager::class,
+            ActivitiesRelationManager::class, // Activities relation manager
+            NotesRelationManager::class, // Notes relation manager added here
         ];
     }
     

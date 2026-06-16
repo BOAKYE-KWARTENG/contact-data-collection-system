@@ -9,6 +9,8 @@ use App\Models\ContactActivity;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use App\Models\ContactNote;
+
 
 
 class Contact extends Model
@@ -40,6 +42,12 @@ class Contact extends Model
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'user_id');
+    }
+
+
+    public function notes(): HasMany
+    {
+        return $this->hasMany(ContactNote::class)->latest();
     }
 
 }

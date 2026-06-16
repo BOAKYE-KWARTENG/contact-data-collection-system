@@ -17,6 +17,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,            // 1. users first
             ContactSeeder::class,         // 2. contacts second
             ContactActivitySeeder::class, // 3. activities last (depends on both)
+            ContactNoteSeeder::class,     // 4. notes last (depends on both)
         ]);
 
     }
