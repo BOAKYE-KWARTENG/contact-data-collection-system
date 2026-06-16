@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ContactResource\Pages;
 use App\Filament\Resources\ContactResource\RelationManagers;
+use App\Filament\Resources\ContactResource\RelationManagers\ActivitiesRelationManager;
 use App\Models\Contact;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -26,6 +27,22 @@ class ContactResource extends Resource
 {
     protected static ?string $model = Contact::class;
 
+    // Restrict query to current user's contacts only ──
+
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        // Admin sees ALL contacts, regular users see only their own
+        if (auth()->user()->hasRole('admin')) {
+            return $query;
+        }
+
+        return $query->where('user_id', auth()->id());
+    }
+
+    
+
     protected static ?string $label = 'Customer Contact';
 
     protected static ?string $navigationIcon = 'heroicon-o-identification';
@@ -37,6 +54,12 @@ class ContactResource extends Resource
                 Forms\Components\Section::make('Contact Information')
                     ->description('Please provide the contact details below.')
                     ->schema([
+
+                        // Hidden field — auto-sets to logged-in user
+                         Forms\Components\Hidden::make('user_id')
+                            ->default(fn () => auth()->id()),
+
+                
                         Forms\Components\TextInput::make('name')
                             ->required()
                             ->maxLength(255),
@@ -220,7 +243,7 @@ class ContactResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            ActivitiesRelationManager::class,
         ];
     }
     
@@ -230,10 +253,10 @@ class ContactResource extends Resource
     // ----------------------------------------------------------------
 
 
-    public static function getEloquentQuery(): Builder
-    {
-        return parent::getEloquentQuery();
-    }
+    // public static function getEloquentQuery(): Builder
+    // {
+    //    return parent::getEloquentQuery();
+    //}
    
 
     public static function getPages(): array
@@ -279,7 +302,8 @@ class ContactResource extends Resource
 
     public static function canEdit($record): bool
     {
-        return (bool) auth()->user()?->hasRole('admin');
+        return auth()->user()->hasRole('admin')
+            || $record->user_id === auth()->id(); // 👈 owner can also edit
     }
 
 

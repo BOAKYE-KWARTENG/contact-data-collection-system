@@ -7,6 +7,7 @@ namespace App\Filament\Widgets;
 use App\Enums\ContactStatus;
 use App\Models\Contact;
 use Filament\Widgets\ChartWidget;
+use Illuminate\Support\Facades\Schema;
 
 class ContactStatusChart extends ChartWidget
 {
@@ -24,8 +25,16 @@ class ContactStatusChart extends ChartWidget
             ContactStatus::Inactive,
         ];
 
+        $user = auth()->user();
+        $query = Contact::query();
+
+        // ✅ Scope to user's own contacts unless admin
+        if ($user && !$user->hasRole('admin')) {
+            $query->where('user_id', $user->id); // 👈 fixed
+        }
+
         $counts = collect($statuses)->map(
-            fn($status) => Contact::where('status', $status)->count()
+            fn($status) => (clone $query)->where('status', $status)->count()
         );
 
         return [
@@ -54,6 +63,14 @@ class ContactStatusChart extends ChartWidget
                 ->map(fn($status) => $status->getLabel())
                 ->toArray(),
         ];
+    }
+
+    protected function isAdmin($user): bool
+    {
+        return ($user->is_admin ?? false)
+            || ($user->admin ?? false)
+            || (method_exists($user, 'isAdmin') && $user->isAdmin())
+            || (method_exists($user, 'hasRole') && $user->hasRole('admin'));
     }
 
     protected function getType(): string

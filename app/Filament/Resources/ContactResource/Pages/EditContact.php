@@ -31,7 +31,17 @@ class EditContact extends EditRecord
             ->body('The user has been saved successfully.');
     }
 
+    // Added authorization check to ensure users can only edit their own contacts
+    protected function authorizeAccess(): void
+    {
+        $contact = $this->getRecord();
 
+        abort_unless(
+            auth()->user()->hasRole('admin') || $contact->user_id === auth()->id(),
+            403,
+            'You can only edit your own contacts.'
+        );
+    }
 
     
 }
