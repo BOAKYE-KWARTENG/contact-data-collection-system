@@ -11,7 +11,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\ContactNote;
 use Illuminate\Database\Eloquent\SoftDeletes; 
-
+use App\Models\ContactDocument;
 
 
 class Contact extends Model
@@ -53,4 +53,8 @@ class Contact extends Model
         return $this->hasMany(ContactNote::class)->latest();
     }
 
+    public function documents(): HasMany
+    {
+        return $this->hasMany(ContactDocument::class)->latest();
+    }
 }

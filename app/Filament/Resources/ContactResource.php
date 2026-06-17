@@ -16,6 +16,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Filament\Tables\Filters\TernaryFilter;
 
 use App\Filament\Resources\ContactResource\RelationManagers\NotesRelationManager; // 
+use App\Filament\Resources\ContactResource\RelationManagers\DocumentsRelationManager; // added for documents relation manager
 
 
 use pxlrbt\FilamentExcel\Actions\Tables\ExportAction;
@@ -37,9 +38,9 @@ class ContactResource extends Resource
     {
         $query = parent::getEloquentQuery()
             ->withoutGlobalScopes([
-                SoftDeletingScope::class, // 👈 MUST be here — removes the automatic
-            ]);                           //    "WHERE deleted_at IS NULL" so the
-                                        //    TrashedFilter can control it instead
+                SoftDeletingScope::class, 
+            ]);                              
+                                        
 
         if (auth()->user()->hasRole('admin')) {
             return $query;
@@ -270,6 +271,7 @@ class ContactResource extends Resource
         return [
             ActivitiesRelationManager::class, // Activities relation manager
             NotesRelationManager::class, // Notes relation manager added here
+            DocumentsRelationManager::class, // Documents relation manager added here
         ];
     }
     
@@ -320,7 +322,8 @@ class ContactResource extends Resource
 
     public static function canEdit($record): bool
     {
-        return auth()->user()->hasRole('admin'); // 👈 owner can also edit
+        return auth()->user()->hasRole('admin')
+            || $record->user_id === auth()->id(); 
     }
 
 
