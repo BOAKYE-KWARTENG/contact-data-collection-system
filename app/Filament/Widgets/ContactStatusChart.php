@@ -26,11 +26,11 @@ class ContactStatusChart extends ChartWidget
         ];
 
         $user = auth()->user();
-        $query = Contact::query();
+        $query = Contact::whereNull('deleted_at'); // start with base query, exclude soft-deleted
 
         // ✅ Scope to user's own contacts unless admin
         if ($user && !$user->hasRole('admin')) {
-            $query->where('user_id', $user->id); // 👈 fixed
+            $query->where('user_id', $user->id);
         }
 
         $counts = collect($statuses)->map(

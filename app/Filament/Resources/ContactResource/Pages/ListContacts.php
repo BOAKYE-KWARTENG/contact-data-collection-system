@@ -13,6 +13,7 @@ use App\Filament\Imports\ProductImporter;
 use EightyNine\ExcelImport\ExcelImportAction;
 
 
+
 class ListContacts extends ListRecords
 {
     protected static string $resource = ContactResource::class;
@@ -90,23 +91,18 @@ class ListContacts extends ListRecords
     public function getTabs(): array
     {
         return [
-            'All'        => Tab::make(),
-
-            // Telco — keep as-is (DB values are uppercase, matches perfectly)
-            'MTN'        => Tab::make()->query(fn (Builder $query) => $query->where('telco', 'MTN')),
-            'Telecel'    => Tab::make()->query(fn (Builder $query) => $query->where('telco', 'Telecel')),
-            'AirtelTigo' => Tab::make()->query(fn (Builder $query) => $query->where('telco', 'AirtelTigo')),
-            'Glo'        => Tab::make()->query(fn (Builder $query) => $query->where('telco', 'Glo')),
-
-            // Gender — changed 'Male' → 'male', 'Female' → 'female'
-            'Male'       => Tab::make()->query(fn (Builder $query) => $query->where('gender', 'male')),
-            'Female'     => Tab::make()->query(fn (Builder $query) => $query->where('gender', 'female')),
-
-            // Marital Status — changed all to lowercase
-            'Single'     => Tab::make()->query(fn (Builder $query) => $query->where('marital_status', 'single')),
-            'Married'    => Tab::make()->query(fn (Builder $query) => $query->where('marital_status', 'married')),
-            'Divorced'   => Tab::make()->query(fn (Builder $query) => $query->where('marital_status', 'divorced')),
-            'Widowed'    => Tab::make()->query(fn (Builder $query) => $query->where('marital_status', 'widowed')),
+            'All'        => Tab::make(), //->query(fn (Builder $query) => $query->whereNull('deleted_at')),
+            'MTN'        => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('telco', 'MTN')),
+            'Telecel'    => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('telco', 'Telecel')),
+            'AirtelTigo' => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('telco', 'AirtelTigo')),
+            'Glo'        => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('telco', 'Glo')),
+            'Male'       => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('gender', 'male')),
+            'Female'     => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('gender', 'female')),
+            'Other'      => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('gender', 'other')),
+            'Single'     => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('marital_status', 'single')),
+            'Married'    => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('marital_status', 'married')),
+            'Divorced'   => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('marital_status', 'divorced')),
+            'Widowed'    => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('marital_status', 'widowed')),
         ];
     }
 

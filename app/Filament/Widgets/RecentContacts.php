@@ -36,7 +36,7 @@ class RecentContacts extends BaseWidget
 
     protected function getTableQuery(): Builder
     {
-        $query = Contact::query()->latest();
+        $query = Contact::whereNull('deleted_at')->latest()->limit(7);
 
         if (auth()->user()->hasRole('admin')) {
             return $query;

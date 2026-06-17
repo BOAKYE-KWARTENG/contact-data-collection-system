@@ -10,12 +10,14 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\ContactNote;
+use Illuminate\Database\Eloquent\SoftDeletes; 
 
 
 
 class Contact extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -30,7 +32,8 @@ class Contact extends Model
     ];
 
     protected $casts = [
-        'status' => ContactStatus::class, // 👈 cast to enum
+        'status' => ContactStatus::class, 
+        'deleted_at' => 'datetime', 
     ];
 
     public function activities(): HasMany

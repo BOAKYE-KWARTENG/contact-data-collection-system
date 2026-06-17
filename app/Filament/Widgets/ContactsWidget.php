@@ -15,8 +15,8 @@ class ContactsWidget extends BaseWidget
 
         // Admin sees all, users see their own
         $query = auth()->user()->hasRole('admin')
-            ? Contact::query()
-            : Contact::where('user_id', auth()->id());
+            ? Contact::whereNull('deleted_at')
+            : Contact::whereNull('deleted_at')->where('user_id', auth()->id());
 
         return [
             // --- General Stats ---

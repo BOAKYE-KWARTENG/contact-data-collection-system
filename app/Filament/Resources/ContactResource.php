@@ -25,6 +25,8 @@ use App\Enums\ContactStatus;
 
 
 
+
+
 class ContactResource extends Resource
 {
     protected static ?string $model = Contact::class;
@@ -33,9 +35,12 @@ class ContactResource extends Resource
 
     public static function getEloquentQuery(): Builder
     {
-        $query = parent::getEloquentQuery();
+        $query = parent::getEloquentQuery()
+            ->withoutGlobalScopes([
+                SoftDeletingScope::class, // 👈 MUST be here — removes the automatic
+            ]);                           //    "WHERE deleted_at IS NULL" so the
+                                        //    TrashedFilter can control it instead
 
-        // Admin sees ALL contacts, regular users see only their own
         if (auth()->user()->hasRole('admin')) {
             return $query;
         }
@@ -44,6 +49,8 @@ class ContactResource extends Resource
     }
 
     
+
+
 
     protected static ?string $label = 'Customer Contact';
 
@@ -197,6 +204,9 @@ class ContactResource extends Resource
                         true: fn ($query) => $query->whereNotNull('email'),
                         false: fn ($query) => $query->whereNull('email'),
                     ),
+
+                Tables\Filters\TrashedFilter::make(),
+
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
@@ -205,11 +215,11 @@ class ContactResource extends Resource
                         ->label('Edit')
                         // ->slideOver(true)
                         ,
-                    Tables\Actions\DeleteAction::make()
-                        ->icon('heroicon-o-trash')
-                        ->label('Delete')
-                        ->slideOver(true)
-                        ,
+                    // Tables\Actions\DeleteAction::make()
+                      //  ->icon('heroicon-o-trash')
+                       // ->label('Delete')
+                       // ->slideOver(true),
+                        
                     
                     // Tables\Actions\ForceDeleteAction::make(),
                     // Tables\Actions\RestoreAction::make(),
@@ -219,14 +229,28 @@ class ContactResource extends Resource
                         ->label('View')
                         ->slideOver()
                         ,
+
+                    // 👇 Soft delete becomes "Move to Trash"
+                    Tables\Actions\DeleteAction::make()
+                        ->label('Move to Trash'),
+
+                    // 👇 Restore from trash
+                    Tables\Actions\RestoreAction::make(),
+
+                    // 👇 Permanently delete (only visible on trashed records)
+                    Tables\Actions\ForceDeleteAction::make()
+                        ->label('Delete Permanently'),
                 ]),
                 
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                    Tables\Actions\ForceDeleteBulkAction::make(),
-                    Tables\Actions\RestoreBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->label('Move to Trash'),
+                    Tables\Actions\ForceDeleteBulkAction::make()
+                        ->label('Delete Permanently'),
+                    Tables\Actions\RestoreBulkAction::make()
+                        ->label('Restore'),
                 ]),
             ])
             
@@ -234,8 +258,7 @@ class ContactResource extends Resource
 
                 ExportAction::make()
                     ->label('Export Contacts')
-                    ->color('primary')
-                    ,
+                    ->color('primary'),
                 
             ]);
 
@@ -251,15 +274,7 @@ class ContactResource extends Resource
     }
     
 
-    // ADDED: Added tabs to the table view----------------------------
-    
-    // ----------------------------------------------------------------
-
-
-    // public static function getEloquentQuery(): Builder
-    // {
-    //    return parent::getEloquentQuery();
-    //}
+   
    
 
     public static function getPages(): array
@@ -305,16 +320,32 @@ class ContactResource extends Resource
 
     public static function canEdit($record): bool
     {
-        return auth()->user()->hasRole('admin')
-            || $record->user_id === auth()->id(); // 👈 owner can also edit
+        return auth()->user()->hasRole('admin'); // 👈 owner can also edit
     }
+
+
+    // public static function canDelete($record): bool
+    // {
+       // return (bool) auth()->user()?->hasRole('admin');
+    // }
 
 
     public static function canDelete($record): bool
     {
-        return (bool) auth()->user()?->hasRole('admin');
+        return auth()->user()->hasRole('admin')
+            || $record->user_id === auth()->id(); // 👈 owner can also trash
     }
 
+    public static function canRestore($record): bool
+    {
+        return auth()->user()->hasRole('admin')
+            || $record->user_id === auth()->id(); // 👈 owner can also restore
+    }
+
+    public static function canForceDelete($record): bool
+    {
+        return auth()->user()->hasRole('admin'); // 👈 only admin can permanently delete
+    }
     
 
 }
