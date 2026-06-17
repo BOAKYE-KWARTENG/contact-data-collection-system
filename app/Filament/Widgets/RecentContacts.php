@@ -20,7 +20,7 @@ class RecentContacts extends BaseWidget
     {
         return $table
             ->query(
-                $this->getTableQuery()->limit(5)
+                $this->getTableQuery()
             )
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
@@ -29,7 +29,9 @@ class RecentContacts extends BaseWidget
                     ->badge()           // renders as a colored badge
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')->dateTime(),
-            ]);
+            ])
+            ->defaultPaginationPageOption(5)  // Show 5 records per page
+            ->paginated([5, 10, 25]);         // Optional: give user page size choices;
     }
 
     protected function getTableQuery(): Builder
