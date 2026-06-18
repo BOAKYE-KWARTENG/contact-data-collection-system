@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\ContactResource\Pages;
 
 use App\Filament\Resources\ContactResource;
+use App\Models\ActivityLog;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Notifications\Notification;
@@ -49,6 +50,20 @@ class EditContact extends EditRecord
     protected function getRedirectUrl(): string
     {
         return $this->getResource()::getUrl('index');
+    }
+
+
+    protected function afterSave(): void
+    {
+        $contact = $this->record;
+
+        ActivityLog::create([
+            'user_id'      => auth()->id(),
+            'action'       => 'updated',
+            'subject_type' => $contact->getMorphClass(),
+            'subject_id'   => $contact->id,
+            'description'  => (auth()->user()?->name ?? 'System') . " updated details on contact: " . $contact->name,
+        ]);
     }
 
     

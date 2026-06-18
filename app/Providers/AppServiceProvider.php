@@ -2,7 +2,12 @@
 
 namespace App\Providers;
 
+
+use App\Models\Contact;
+use App\Observers\ContactObserver;
 use Illuminate\Support\ServiceProvider;
+
+
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +24,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        // This binds the observer globally to the contact execution lifecycle
+        Contact::observe(ContactObserver::class);
     }
+
+
+    
 }
