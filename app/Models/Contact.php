@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use App\Models\ContactNote;
 use Illuminate\Database\Eloquent\SoftDeletes; 
 use App\Models\ContactDocument;
-
+use App\Models\Reminder;
 
 class Contact extends Model
 {
@@ -57,4 +57,25 @@ class Contact extends Model
     {
         return $this->hasMany(ContactDocument::class)->latest();
     }
+
+
+    public function reminders(): HasMany
+    {
+        return $this->hasMany(Reminder::class)->latest();
+    }
+
+
+    /**
+     * A contact belongs to a specific user (owner).
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * A contact has many reminders.
+     */
+    
+
 }

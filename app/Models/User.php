@@ -10,6 +10,8 @@ use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use App\Models\Contact;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\Reminder;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class User extends Authenticatable
 {
@@ -49,4 +51,10 @@ class User extends Authenticatable
     {
         return $this->hasMany(Contact::class);
     }
+
+    public function reminders(): HasManyThrough
+    {
+        return $this->hasManyThrough(Reminder::class, Contact::class);
+    }
+
 }

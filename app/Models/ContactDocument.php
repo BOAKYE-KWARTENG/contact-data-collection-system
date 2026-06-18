@@ -23,6 +23,10 @@ class ContactDocument extends Model
         'file_size' => 'integer',
     ];
 
+
+
+
+    
     // Relationships 
 
     public function contact(): BelongsTo
@@ -34,6 +38,9 @@ class ContactDocument extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
+
+
+
 
     // Helper: Human Readable File Size
 

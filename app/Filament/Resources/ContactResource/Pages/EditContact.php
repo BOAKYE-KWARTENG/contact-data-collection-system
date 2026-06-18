@@ -43,5 +43,13 @@ class EditContact extends EditRecord
         );
     }
 
+
+
+    // Automatically redirects back to the contact table view after a successful save
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
+
     
 }

@@ -18,7 +18,7 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use pxlrbt\FilamentSpotlight\SpotlightPlugin;  // Import the SpotlightPlugin
-// use App\Filament\Pages\Auth\Login; // Import the custom Login page
+use Filament\Notifications\Livewire\DatabaseNotifications; // Import the DatabaseNotifications widget
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -43,6 +43,10 @@ class AdminPanelProvider extends PanelProvider
             ->plugins([
                 SpotlightPlugin::make(),
             ])
+            ->databaseNotifications()              // Enable database notifications
+
+            // Edit to 12hours for testing purposes (default is 60s)
+            ->databaseNotificationsPolling('30s')  // optional: set polling interval for real-time updates
             
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')

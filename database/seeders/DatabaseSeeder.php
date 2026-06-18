@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
             ContactSeeder::class,         // 2. contacts second
             ContactActivitySeeder::class, // 3. activities last (depends on both)
             ContactNoteSeeder::class,     // 4. notes last (depends on both)
+            ReminderTestSeeder::class,    // 5. New Reminders (safely hooks onto contacts last)
         ]);
 
     }
