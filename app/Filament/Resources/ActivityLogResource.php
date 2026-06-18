@@ -28,6 +28,26 @@ class ActivityLogResource extends Resource
             ]);
     }
 
+
+    /**
+     * Controls who can see this resource in the navigation sidebar and access its URLs.
+     */
+    /**
+     * Dynamically hides the resource from the navigation sidebar for non-admins.
+     */
+    public static function shouldRegisterNavigation(): bool
+    {
+        return auth()->user()?->hasRole('admin') ?? false;
+    }
+
+    /**
+     * Hard-locks the URL endpoints so standard users cannot guess the URL.
+     */
+    public static function canViewAny(): bool
+    {
+        return auth()->user()?->hasRole('admin') ?? false;
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -82,4 +102,7 @@ class ActivityLogResource extends Resource
             'index' => Pages\ListActivityLogs::route('/'),
         ];
     }
+
+    
+    
 }
