@@ -26,6 +26,11 @@ use App\Enums\ContactStatus;
 
 
 
+use App\Imports\ContactImport;
+use Filament\Tables\Actions\Action;
+use Maatwebsite\Excel\Facades\Excel;
+use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
+use Illuminate\Support\Facades\Storage;
 
 
 class ContactResource extends Resource
@@ -259,7 +264,65 @@ class ContactResource extends Resource
 
                 ExportAction::make()
                     ->label('Export Contacts')
-                    ->color('primary'),
+                    ->color('primary')
+                    ->icon('heroicon-o-arrow-up-tray'),
+
+
+                // ── Download Template ──────────────────────────
+                Action::make('download_template')
+                    ->label('Download Template')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('gray')
+                    ->url(Storage::url('contact-import-template.xlsx'))
+                    ->openUrlInNewTab(),
+
+                // ── Import Contacts ────────────────────────────
+                Action::make('import')
+                    ->label('Import Contacts')
+                    ->icon('heroicon-o-arrow-down-tray')
+                    ->color('info')
+                    ->form([
+                        \Filament\Forms\Components\FileUpload::make('file')
+                            ->label('Excel or CSV File')
+                            ->acceptedFileTypes([
+                                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                                'application/vnd.ms-excel',
+                                'text/csv',
+                                'text/plain',
+                            ])
+                            ->maxSize(10240) // 10MB
+                            ->required()
+                            ->helperText('Download the template above to see the required format.'),
+                    ])
+                    ->action(function (array $data) {
+                        $file = storage_path(
+                            'app/public/' . $data['file']
+                        );
+
+                        $import = new ContactImport();
+
+                        Excel::import($import, $file);
+
+                        // ── Feedback to user ───────────────────
+                        $imported   = \App\Models\Contact::where('user_id', auth()->id())->count();
+                        $duplicates = $import->duplicatesCount;
+                        $emails     = implode(', ', $import->duplicateEmails);
+
+                        if ($duplicates > 0) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Import Completed with Duplicates')
+                                ->body("Duplicates skipped ({$duplicates}): {$emails}")
+                                ->warning()
+                                ->persistent()  // stays until dismissed
+                                ->send();
+                        } else {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Import Successful')
+                                ->body('All contacts imported successfully.')
+                                ->success()
+                                ->send();
+                        }
+                    }),
                 
             ]);
 

@@ -21,57 +21,7 @@ class ListContacts extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-
-            ExcelImportAction::make()
-
-                // ------------------------------------------------------------
-
-                
-                // ------------------------------------------------------------
-
-                ->sampleExcel(
-                    sampleData: [
-                        [
-                            'name' => 'John Doe',
-                            'gender' => 'male',
-                            'age_range' => '25-34',
-                            'marital_status' => 'single',
-                            'mobile_number' => '0550123456',
-                            'telco' => 'MTN',
-                            'email' => 'john.doe@example.com',
-                        ],
-                        [
-                            'name' => 'Jane Smith',
-                            'gender' => 'female',
-                            'age_range' => '35-44',
-                            'marital_status' => 'married',
-                            'mobile_number' => '0240123456',
-                            'telco' => 'Telecel',
-                            'email' => 'jane.smith@example.com',
-                        ],
-                        [
-                            'name' => 'Alex Johnson',
-                            'gender' => 'other',
-                            'age_range' => '18-24',
-                            'marital_status' => 'single',
-                            'mobile_number' => '0200987654',
-                            'telco' => 'AirtelTigo',
-                            'email' => 'alex.johnson@example.com',
-                        ],
-                    ],
-
-                    fileName: 'sample.xlsx',
-                    exportClass: App\Exports\SampleExport::class,
-                    sampleButtonLabel: 'Download Sample',
-                    customiseActionUsing: fn(Action $action) => $action->color('secondary')
-                        ->icon('heroicon-m-clipboard')
-                        ->requiresConfirmation(),
-                )
-                ->color('primary')
-                ->label('Import Contacts'),
-
-
-            Actions\CreateAction::make(),
+                Actions\CreateAction::make(),
         ];
 
     }
