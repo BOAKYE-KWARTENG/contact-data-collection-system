@@ -26,7 +26,7 @@ return new class extends Migration
             ]);
             $table->enum('marital_status', ['single', 'married', 'divorced', 'widowed']);
             $table->string('mobile_number');
-            $table->enum('telco', ['MTN', 'Telecel', 'AirtelTigo', 'Glo']);
+            $table->foreignId('telco_id')->constrained('telcos')->cascadeOnDelete();
             $table->string('email')->unique();
             $table->timestamps();
         });

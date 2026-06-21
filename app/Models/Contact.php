@@ -26,7 +26,7 @@ class Contact extends Model
         'age_range',
         'marital_status',
         'mobile_number',
-        'telco',
+        'telco_id',
         'status',
         'email',
     ];
@@ -73,9 +73,10 @@ class Contact extends Model
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * A contact has many reminders.
-     */
+    public function telco(): BelongsTo
+    {
+        return $this->belongsTo(Telco::class);
+    }
     
 
 }

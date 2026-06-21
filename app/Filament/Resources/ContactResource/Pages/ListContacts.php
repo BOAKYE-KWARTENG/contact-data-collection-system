@@ -40,20 +40,47 @@ class ListContacts extends ListRecords
 
     public function getTabs(): array
     {
-        return [
-            'All'        => Tab::make(), //->query(fn (Builder $query) => $query->whereNull('deleted_at')),
-            'MTN'        => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('telco', 'MTN')),
-            'Telecel'    => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('telco', 'Telecel')),
-            'AirtelTigo' => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('telco', 'AirtelTigo')),
-            'Glo'        => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('telco', 'Glo')),
-            'Male'       => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('gender', 'male')),
-            'Female'     => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('gender', 'female')),
-            'Other'      => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('gender', 'other')),
-            'Single'     => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('marital_status', 'single')),
-            'Married'    => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('marital_status', 'married')),
-            'Divorced'   => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('marital_status', 'divorced')),
-            'Widowed'    => Tab::make()->query(fn (Builder $query) => $query->whereNull('deleted_at')->where('marital_status', 'widowed')),
+        // 1. Initialize mandatory default global "All" tab
+        $tabs = [
+            'All' => Tab::make()
+                ->modifyQueryUsing(fn (Builder $query) => $query->whereNull('deleted_at')),
         ];
+
+        // 2. Loop and append the Database Telcos dynamically
+        try {
+            $telcos = \App\Models\Telco::orderBy('name')->get();
+
+            foreach ($telcos as $telco) {
+                // Using a prefix key like 'telco_' prevents collision with other tab identifiers
+                $tabs['telco_' . $telco->code] = Tab::make($telco->name)
+                    ->modifyQueryUsing(fn (Builder $query) => $query
+                        ->whereNull('deleted_at')
+                        ->where('telco_id', $telco->id) // ✅ Relational lookup matching your new database structure
+                    );
+            }
+        } catch (\Exception $e) {
+            // Fallback gracefully if database or migrations aren't fully completed yet
+        }
+
+        // 3. Append your static demographic layout groupings
+        $staticDemographics = [
+            // Gender Filters
+            'Male'     => fn (Builder $query) => $query->whereNull('deleted_at')->where('gender', 'male'),
+            'Female'   => fn (Builder $query) => $query->whereNull('deleted_at')->where('gender', 'female'),
+            'Other'    => fn (Builder $query) => $query->whereNull('deleted_at')->where('gender', 'other'),
+            
+            // Marital Status Filters
+            'Single'   => fn (Builder $query) => $query->whereNull('deleted_at')->where('marital_status', 'single'),
+            'Married'  => fn (Builder $query) => $query->whereNull('deleted_at')->where('marital_status', 'married'),
+            'Divorced' => fn (Builder $query) => $query->whereNull('deleted_at')->where('marital_status', 'divorced'),
+            'Widowed'  => fn (Builder $query) => $query->whereNull('deleted_at')->where('marital_status', 'widowed'),
+        ];
+
+        foreach ($staticDemographics as $label => $queryCallback) {
+            $tabs[$label] = Tab::make($label)->modifyQueryUsing($queryCallback);
+        }
+
+        return $tabs;
     }
 
     public function getDefaultActiveTab(): string | int | null

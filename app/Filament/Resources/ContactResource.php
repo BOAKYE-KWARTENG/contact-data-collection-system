@@ -33,6 +33,10 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 use Illuminate\Support\Facades\Storage;
 
 
+use App\Models\Telco;
+use Illuminate\Support\Str;
+
+
 class ContactResource extends Resource
 {
     protected static ?string $model = Contact::class;
@@ -112,14 +116,31 @@ class ContactResource extends Resource
                             ->required()
                             ->maxLength(255),
 
-                        Forms\Components\Select::make('telco')
+                        Forms\Components\Select::make('telco_id')
+                            ->relationship('telco', 'name') // 1. Automatically reads options from the `telcos` table
+                            ->label('Network Carrier')
+                            ->searchable() // Makes long lists easy to navigate
+                            ->preload()    // Preloads options into memory for a snappy UI response
                             ->required()
-                            ->options([
-                                'MTN' => 'MTN',
-                                'Telecel' => 'Telecel',
-                                'AirtelTigo' => 'AirtelTigo',
-                                'Glo' => 'Glo',
-                            ]),
+                            ->createOptionForm([ // 2. This builds the dynamic inline "+" modal popup form
+                                Forms\Components\TextInput::make('name')
+                                    ->label('Carrier Name')
+                                    ->required()
+                                    ->unique('telcos', 'name') // Prevent duplicate database records
+                                    ->live(onBlur: true)
+                                    ->afterStateUpdated(fn (string $operation, $state, Forms\Set $set) => 
+                                        // 3. Automatically generates the technical slug/code behind the scenes
+                                        $set('code', Str::slug($state))
+                                    ),
+
+                                Forms\Components\TextInput::make('code')
+                                    ->label('Technical Code')
+                                    ->required()
+                                    ->disabled() // Grayed out so users don't break code conventions manually
+                                    ->dehydrated() // Ensures the disabled value still gets posted to the database
+                                    ->unique('telcos', 'code'),
+                            ])
+                            ->createOptionUsing(fn (array $data): int => \App\Models\Telco::create($data)->id),
 
                         Forms\Components\Select::make('status')
                             ->label('Status')
@@ -150,10 +171,13 @@ class ContactResource extends Resource
                 Tables\Columns\TextColumn::make('marital_status'),
                 Tables\Columns\TextColumn::make('mobile_number')
                     ->searchable(isIndividual: true),
-                Tables\Columns\TextColumn::make('telco'),
+                Tables\Columns\TextColumn::make('telco.name')
+                    ->label('Telco')
+                    ->searchable() // Allows you to search contacts by their network provider name!
+                    ->sortable(),
                 Tables\Columns\BadgeColumn::make('status')
                     ->label('Status')
-                    ->badge()           // 👈 renders as a colored badge
+                    ->badge()           // renders as a colored badge
                     ->sortable()
                     ->searchable(),
                     
@@ -194,13 +218,9 @@ class ContactResource extends Resource
                         'divorced' => 'Divorced',
                         'widowed' => 'Widowed',
                     ]),
-                Tables\Filters\SelectFilter::make('telco')
-                    ->options([
-                        'MTN' => 'MTN',
-                        'Telecel' => 'Telecel',
-                        'AirtelTigo' => 'AirtelTigo',
-                        'Glo' => 'Glo',
-                    ]),
+                Tables\Filters\SelectFilter::make('telco_id')
+                    ->label('Filter by Carrier')
+                    ->relationship('telco', 'name'),
 
                 TernaryFilter::make('has_email')
                     ->label('Has Email')
