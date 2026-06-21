@@ -19,6 +19,8 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 use pxlrbt\FilamentSpotlight\SpotlightPlugin;  // Import the SpotlightPlugin
 use Filament\Notifications\Livewire\DatabaseNotifications; // Import the DatabaseNotifications widget
+use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
+
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -42,6 +44,22 @@ class AdminPanelProvider extends PanelProvider
             // Spotlight Plugin
             ->plugins([
                 SpotlightPlugin::make(),
+                 FilamentShieldPlugin::make()
+                    ->gridColumns([
+                        'default' => 1,
+                        'sm'      => 2,
+                        'lg'      => 3,
+                    ])
+                    ->sectionColumnSpan(1)
+                    ->checkboxListColumns([
+                        'default' => 1,
+                        'sm'      => 2,
+                        'lg'      => 3,
+                    ])
+                    ->resourceCheckboxListColumns([
+                        'default' => 1,
+                        'sm'      => 2,
+                    ]),
             ])
             ->databaseNotifications()              // Enable database notifications
 
