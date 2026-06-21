@@ -28,8 +28,12 @@ class ContactStatusChart extends ChartWidget
         $user = auth()->user();
         $query = Contact::whereNull('deleted_at'); // start with base query, exclude soft-deleted
 
-        // ✅ Scope to user's own contacts unless admin
-        if ($user && !$user->hasRole('admin')) {
+        // Scope to user's own contacts unless they have permissions to view all
+        if ($user && !(
+            $user->hasRole('admin') ||
+            $user->hasRole('super_admin') ||
+            $user->hasRole('team_lead')
+        )) {
             $query->where('user_id', $user->id);
         }
 

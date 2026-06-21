@@ -13,10 +13,13 @@ class ContactsWidget extends BaseWidget
     {
 
 
-        // Admin sees all, users see their own
-        $query = auth()->user()->hasRole('admin')
-            ? Contact::whereNull('deleted_at')
-            : Contact::whereNull('deleted_at')->where('user_id', auth()->id());
+        // Only admins, super admins, and team leads see all; other users see only dears
+        if (auth()->user()->hasAnyRole(['admin', 'super_admin', 'team_lead'])) {
+            $query = Contact::whereNull('deleted_at');
+        } else {
+            $query = Contact::whereNull('deleted_at')
+                ->where('status', ContactStatus::Customer->value); //
+        }
 
         return [
             // --- General Stats ---

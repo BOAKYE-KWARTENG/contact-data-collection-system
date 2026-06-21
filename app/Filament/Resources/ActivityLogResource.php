@@ -19,6 +19,7 @@ class ActivityLogResource extends Resource
     protected static ?string $model = ActivityLog::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationGroup = 'Contact Management';
 
     public static function form(Form $form): Form
     {
@@ -28,25 +29,6 @@ class ActivityLogResource extends Resource
             ]);
     }
 
-
-    /**
-     * Controls who can see this resource in the navigation sidebar and access its URLs.
-     */
-    /**
-     * Dynamically hides the resource from the navigation sidebar for non-admins.
-     */
-    public static function shouldRegisterNavigation(): bool
-    {
-        return auth()->user()?->hasRole('admin') ?? false;
-    }
-
-    /**
-     * Hard-locks the URL endpoints so standard users cannot guess the URL.
-     */
-    public static function canViewAny(): bool
-    {
-        return auth()->user()?->hasRole('admin') ?? false;
-    }
 
     public static function table(Table $table): Table
     {
