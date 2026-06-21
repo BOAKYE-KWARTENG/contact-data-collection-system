@@ -29,7 +29,7 @@ return [
 
     'panel_user' => [
         'enabled' => true,
-        'name' => 'user',
+        'name' => 'user', // The name of the user model used for the Filament panel
     ],
 
     'permission_prefixes' => [
