@@ -38,7 +38,7 @@ class RecentContacts extends BaseWidget
     {
         $query = Contact::whereNull('deleted_at')->latest()->limit(7);
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasRole('admin') || auth()->user()->hasRole('super_admin') || auth()->user()->hasRole('team_lead')) {
             return $query;
         }
 

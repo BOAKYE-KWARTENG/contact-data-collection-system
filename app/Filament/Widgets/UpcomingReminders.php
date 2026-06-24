@@ -24,12 +24,17 @@ class UpcomingReminders extends BaseWidget
             ->query(
                 Reminder::query()
                     ->upcoming() // Filters uncompleted & due >= today
-                    ->when(!auth()->user()->hasRole('admin'), function (Builder $query) {
-                        // If NOT an admin, restrict reminders to contacts owned by the current user
-                        $query->whereHas('contact', function ($q) {
-                            $q->where('user_id', auth()->id());
-                        });
-                    })
+                    ->when(
+                        !auth()->user()->hasAnyRole(['admin', 'super_admin', 'team_lead']) &&
+                        !auth()->user()->can('view_any_contact'),
+                        function (Builder $query) {
+                            // If NOT an admin, super admin, or team lead,
+                            // restrict reminders to dear contacts only
+                            $query->whereHas('contact', function ($q) {
+                                $q->where('is_dear', true);
+                            });
+                        }
+                    )
                     ->limit(5)
             )
             ->columns([

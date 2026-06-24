@@ -40,10 +40,12 @@ use Illuminate\Support\Str;
 class ContactResource extends Resource
 {
     protected static ?string $model = Contact::class;
+    protected static ?string $navigationIcon = 'heroicon-o-user-circle';
+    protected static ?string $navigationGroup = 'Contact Management';
 
     // Restrict query to current user's contacts only ──
 
-    public static function getEloquentQuery(): Builder
+    /* public static function getEloquentQuery(): Builder
     {
         $query = parent::getEloquentQuery()
             ->withoutGlobalScopes([
@@ -56,15 +58,27 @@ class ContactResource extends Resource
         }
 
         return $query->where('user_id', auth()->id());
-    }
+    } */
 
-    
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery()
+            ->withoutGlobalScopes([SoftDeletingScope::class]);
+
+        $user = auth()->user();
+
+        // super_admin, admin, or team_lead see all contacts
+        if ($user->hasRole('super_admin') || $user->hasRole('admin') || $user->hasRole('team_lead')) {
+            return $query;
+        }
+
+        // Regular users see only their own
+        return $query->where('user_id', $user->id);
+    }
 
 
 
     protected static ?string $label = 'Customer Contact';
-
-    protected static ?string $navigationIcon = 'heroicon-o-identification';
 
     public static function form(Form $form): Form
     {
@@ -376,7 +390,7 @@ class ContactResource extends Resource
 
 
     // added
-    protected static function isAdmin(): bool
+    /* protected static function isAdmin(): bool
     {
         return (bool) auth()->user()?->hasRole('admin');
     }
@@ -409,11 +423,6 @@ class ContactResource extends Resource
     }
 
 
-    // public static function canDelete($record): bool
-    // {
-       // return (bool) auth()->user()?->hasRole('admin');
-    // }
-
 
     public static function canDelete($record): bool
     {
@@ -430,7 +439,7 @@ class ContactResource extends Resource
     public static function canForceDelete($record): bool
     {
         return auth()->user()->hasRole('admin'); // 👈 only admin can permanently delete
-    }
+    } */
     
 
 }

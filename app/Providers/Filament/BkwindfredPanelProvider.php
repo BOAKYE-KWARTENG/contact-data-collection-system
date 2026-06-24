@@ -22,7 +22,7 @@ use Filament\Notifications\Livewire\DatabaseNotifications; // Import the Databas
 use BezhanSalleh\FilamentShield\FilamentShieldPlugin;
 
 
-class AdminPanelProvider extends PanelProvider
+class BkwindfredPanelProvider extends PanelProvider
 {
     public function panel(Panel $panel): Panel
     {

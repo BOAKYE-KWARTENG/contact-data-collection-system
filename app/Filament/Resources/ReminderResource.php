@@ -19,6 +19,7 @@ class ReminderResource extends Resource
     protected static ?string $model = Reminder::class;
 
     protected static ?string $navigationIcon  = 'heroicon-o-bell';
+    protected static ?string $navigationGroup = 'Contact Management';
     protected static ?string $navigationLabel = 'Reminders';
     protected static ?int    $navigationSort  = 3;
 
@@ -31,8 +32,8 @@ class ReminderResource extends Resource
                     Forms\Components\Select::make('contact_id')
                         ->label('Contact')
                         ->options(function () {
-                            // If user is an admin, let them see and select any contact in the CRM
-                            if (auth()->user()->hasRole('admin')) {
+                            // If user is an admin, super_admin, or has global view permission, let them see and select any contact
+                            if (auth()->user()->hasRole('admin') || auth()->user()->hasRole('super_admin') || auth()->user()->can('view_any_contact')) {
                                 return \App\Models\Contact::pluck('name', 'id');
                             }
 
@@ -180,7 +181,7 @@ class ReminderResource extends Resource
     {
         $query = parent::getEloquentQuery();
 
-        if (auth()->user()->hasRole('admin')) {
+        if (auth()->user()->hasRole('admin') || auth()->user()->hasRole('super_admin') || auth()->user()->hasRole('team_lead')) {
             return $query;
         }
 
@@ -195,17 +196,21 @@ class ReminderResource extends Resource
 
     // ── Permissions ───────────────────────────────────────
 
-    public static function canEdit($record): bool
+   /*  public static function canEdit($record): bool
     {
         return auth()->user()->hasRole('admin')
+            || auth()->user()->hasRole('super_admin')
+            || auth()->user()->can('view_any_contact')
             || $record->contact->user_id === auth()->id();
     }
 
     public static function canDelete($record): bool
     {
         return auth()->user()->hasRole('admin')
+            || auth()->user()->hasRole('super_admin')
+            || auth()->user()->can('view_any_contact')
             || $record->contact->user_id === auth()->id();
-    }
+    } */
 
 
 
